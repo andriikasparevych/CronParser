@@ -30,19 +30,58 @@ command /usr/bin/find
 
         public CronParsingResult Parse(string minute, string hour, string dayOfMonth, string month, string dayOfWeek, string command) {
             
-            return new CronParsingResult(ConvertToString(ParseCronExpression(minute)),
-                                        ConvertToString(ParseCronExpression(hour)),
-                                        ConvertToString(ParseCronExpression(dayOfMonth)),
-                                        ConvertToString(ParseCronExpression(month)),
-                                        ConvertToString(ParseCronExpression(dayOfWeek)),
+            return new CronParsingResult(ConvertToString(new MinutePartParser().Parse(minute)),
+                                        ConvertToString(new HourPartParser().Parse(hour)),
+                                        ConvertToString(new DayOfMonthPartParser().Parse(dayOfMonth)),
+                                        ConvertToString(new MonthPartParser().Parse(month)),
+                                        ConvertToString(new DayOfWeekPartParser().Parse(dayOfWeek)),
                                         command);
         }
 
-        private IEnumerable<int> ParseCronExpression(string input) {
+        private static string ConvertToString(IEnumerable<int> intArr) {
+            return string.Join(' ', intArr);
+        }
+    }
 
+    internal class MinutePartParser : CronPartParser
+    {
+        public override int MaxValue => 59;
+    }
+
+    internal class HourPartParser : CronPartParser
+    {
+        public override int MaxValue => 23;
+    }
+
+    internal class DayOfMonthPartParser : CronPartParser
+    {
+        public override int MinValue => 1;
+        
+        // Assuming all months have 31 days to save time
+        public override int MaxValue => 31;
+    }
+
+    internal class MonthPartParser : CronPartParser
+    {
+        public override int MaxValue => 11;
+    }
+
+    internal class DayOfWeekPartParser : CronPartParser
+    {
+        public override int MinValue => 1;
+        public override int MaxValue => 7;
+    }
+
+
+    internal abstract class CronPartParser {
+        public virtual int MinValue => 0;
+
+        public abstract int MaxValue { get; }
+
+        public IEnumerable<int> Parse(string input) {
             var commaParts = input.Split(',');
             if (commaParts.Length > 1) {
-                return commaParts.SelectMany(ParseCronExpression);
+                return commaParts.SelectMany(Parse);
             }
 
             var slashParts = input.Split('/');
@@ -50,7 +89,7 @@ command /usr/bin/find
                 var expression = slashParts[0];
                 var everyModifier = int.Parse(slashParts[1]);
 
-                var iterations = ParseCronExpression(expression);
+                var iterations = Parse(expression);
                 return iterations.Where((value, index) => index % everyModifier == 0).ToArray();
             }
 
@@ -61,17 +100,16 @@ command /usr/bin/find
                 return Enumerable.Range(from, to);
             }
 
+            if (input == "*") {
+                return GetFullRange();
+            }
+
             return new [] { int.Parse(input) };
         }
 
-        private static string ConvertToString(IEnumerable<int> intArr) {
-            return string.Join(' ', intArr);
+        protected IEnumerable<int> GetFullRange() {
+            return Enumerable.Range(MinValue, MaxValue);
         }
-    }
-    
-    public class CronPartParser {
-        public int MaxValue { get; }
-
     } 
 
 
