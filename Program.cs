@@ -41,13 +41,21 @@ command /usr/bin/find
         private string ParseCronExpression(string input) {
 
             var commaParts = input.Split(',');
-            if (commaParts.Count() > 1) {
+            if (commaParts.Length > 1) {
                 return string.Join(' ', commaParts.Select(ParseCronExpression));
             }
-            return commaParts[0];
+
+            var dashParts = input.Split('-');
+            if (dashParts.Length > 1) {
+                var from = int.Parse(dashParts[0]);
+                var to = int.Parse(dashParts[1]);
+                return string.Join(' ', Enumerable.Range(from, to));
+            }
+
+            return input;
         }
     }
-
+    
     public record CronParsingResult(string Minute, string Hour, string DayOfMonth, string Month, string DayOfWeek, string Command) {
     }
 }
