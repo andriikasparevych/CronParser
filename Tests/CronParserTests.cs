@@ -17,9 +17,8 @@ namespace CronParser.Tests {
         static object[] TestCases = {
             new object[] {"1 2 3 4 5 /usr/bin/find", new CronParsingResult("1","2","3","4","5","/usr/bin/find")},
             new object[] {"1,2 2 3 4 5 /usr/bin/find", new CronParsingResult("1 2","2","3","4","5","/usr/bin/find")},
-            new object[] {"1-5 2 3 4 5 /usr/bin/find", new CronParsingResult("1 2 3 4 5","2","3","4","5","/usr/bin/find")}
-
-
+            new object[] {"1-5 2 3 4 5 /usr/bin/find", new CronParsingResult("1 2 3 4 5","2","3","4","5","/usr/bin/find")},
+            new object[] {"1-5/2 2 3 4 5 /usr/bin/find", new CronParsingResult("1 3 5","2","3","4","5","/usr/bin/find")}
         };
     }
 }
