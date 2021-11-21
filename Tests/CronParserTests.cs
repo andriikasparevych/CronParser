@@ -5,16 +5,21 @@ namespace CronParser.Tests {
     [TestFixture]    
     public class CronParserTests {
         
-        [TestCase]
-        public void SimpleCaseWithoutSpecialOperators() {
-            var input = "1 2 3 4 5 /usr/bin/find";
-            var expected = new CronParsingResult("1","2","3","4","5","/usr/bin/find");
-            
+        [TestCaseSource(nameof(TestCases))]
+        public void ParseTest(string input, CronParsingResult expected) {           
             var parser = new CronParser();
 
             var actual = parser.Parse(input);
 
             Assert.AreEqual(expected, actual); 
         }
+
+        static object[] TestCases = {
+            new object[] {"1 2 3 4 5 /usr/bin/find", new CronParsingResult("1","2","3","4","5","/usr/bin/find")},
+            new object[] {"1,2 2 3 4 5 /usr/bin/find", new CronParsingResult("1 2","2","3","4","5","/usr/bin/find")},
+            new object[] {"1-5 2 3 4 5 /usr/bin/find", new CronParsingResult("1 2 3 4 5","2","3","4","5","/usr/bin/find")}
+
+
+        };
     }
 }
