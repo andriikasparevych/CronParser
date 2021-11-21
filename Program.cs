@@ -23,13 +23,23 @@ command /usr/bin/find
 
 */
     public class CronParser {
-        public string Parse(string cron) {
+        public CronParsingResult Parse(string cron) {
             var parts = cron.Split(' ');
-            return Parse(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]).ToString();
+            return Parse(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]);
         }
 
         public CronParsingResult Parse(string minute, string hour, string dayOfMonth, string month, string dayOfWeek, string command) {
-            return new CronParsingResult("","","","","","");
+            
+            return new CronParsingResult(ParseCronExpression(minute),
+                                        ParseCronExpression(hour),
+                                        ParseCronExpression(dayOfMonth),
+                                        ParseCronExpression(month),
+                                        ParseCronExpression(dayOfWeek),
+                                        command);
+        }
+
+        private string ParseCronExpression(string input) {
+            return input;
         }
     }
 
