@@ -30,32 +30,51 @@ command /usr/bin/find
 
         public CronParsingResult Parse(string minute, string hour, string dayOfMonth, string month, string dayOfWeek, string command) {
             
-            return new CronParsingResult(ParseCronExpression(minute),
-                                        ParseCronExpression(hour),
-                                        ParseCronExpression(dayOfMonth),
-                                        ParseCronExpression(month),
-                                        ParseCronExpression(dayOfWeek),
+            return new CronParsingResult(ConvertToString(ParseCronExpression(minute)),
+                                        ConvertToString(ParseCronExpression(hour)),
+                                        ConvertToString(ParseCronExpression(dayOfMonth)),
+                                        ConvertToString(ParseCronExpression(month)),
+                                        ConvertToString(ParseCronExpression(dayOfWeek)),
                                         command);
         }
 
-        private string ParseCronExpression(string input) {
+        private IEnumerable<int> ParseCronExpression(string input) {
 
             var commaParts = input.Split(',');
             if (commaParts.Length > 1) {
-                return string.Join(' ', commaParts.Select(ParseCronExpression));
+                return commaParts.SelectMany(ParseCronExpression);
+            }
+
+            var slashParts = input.Split('/');
+            if (slashParts.Length > 1) {
+                var expression = slashParts[0];
+                var everyModifier = int.Parse(slashParts[1]);
+
+                var iterations = ParseCronExpression(expression);
+                return iterations.Where((value, index) => index % everyModifier == 0).ToArray();
             }
 
             var dashParts = input.Split('-');
             if (dashParts.Length > 1) {
                 var from = int.Parse(dashParts[0]);
                 var to = int.Parse(dashParts[1]);
-                return string.Join(' ', Enumerable.Range(from, to));
+                return Enumerable.Range(from, to);
             }
 
-            return input;
+            return new [] { int.Parse(input) };
+        }
+
+        private static string ConvertToString(IEnumerable<int> intArr) {
+            return string.Join(' ', intArr);
         }
     }
     
+    public class CronPartParser {
+        public int MaxValue { get; }
+
+    } 
+
+
     public record CronParsingResult(string Minute, string Hour, string DayOfMonth, string Month, string DayOfWeek, string Command) {
     }
 }
