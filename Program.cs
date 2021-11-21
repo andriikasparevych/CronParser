@@ -39,7 +39,12 @@ command /usr/bin/find
         }
 
         private string ParseCronExpression(string input) {
-            return input;
+
+            var commaParts = input.Split(',');
+            if (commaParts.Count() > 1) {
+                return string.Join(' ', commaParts.Select(ParseCronExpression));
+            }
+            return commaParts[0];
         }
     }
 
