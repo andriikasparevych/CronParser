@@ -9,7 +9,6 @@ Target platform: .NET 6.0
   
     If you're running a clean Ubuntu 20.04 (e.g. in a docker container) use the following commands:
 
->>>
 ```
 apt-get update
 apt-get install sudo -y
@@ -20,13 +19,17 @@ apt-get update
 sudo apt install apt-transport-https -y 
 sudo apt install dotnet-sdk-6.0 -y -q
 ```
->>>
 
 > The full instruction can be found at https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu#2104-
 
-2. Clone this repo
-3. Navigate to the root folder (CronParser)
-4. Run `dotnet run "{argument_string}"` passing the argument string afterwards. This command will compile and run the project. E.g.
+2. Clone this repo and navigate to the root folder (CronParser)
+```
+sudo apt-get install git -y
+git clone https://github.com/andriikasparevych/CronParser.git
+cd CronParser
+```
+
+3. Run `dotnet run "{argument_string}"` passing the argument string afterwards. This command will compile and run the project. E.g.
 
 `dotnet run "*/15 0 1,15 * 1-5 /usr/bin/find"`
 
